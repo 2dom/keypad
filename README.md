@@ -140,6 +140,41 @@ The passcode flow works like this:
 
 Press **Clear** at any time to wipe the buffer and start over.
 
+### Home Assistant with ZHA
+
+Once the keypad is flashed, getting it into [Home Assistant](https://www.home-assistant.io/) through [ZHA](https://www.home-assistant.io/integrations/zha/) takes about two minutes.
+
+1. In Home Assistant go to **Settings → Devices & Services → Zigbee Home Automation** and open your coordinator.
+2. Click **Add device** and confirm — this opens the network for joining.
+3. Wake the keypad by touching any key. Within a few seconds it should appear as **DrDoms KeyPad2**.
+4. Finish the interview if ZHA asks — no special configuration is needed.
+
+After pairing, open the device page and note the entity names ZHA created. The important one is the **Passcode** analog-input sensor — in my setup it shows up as `sensor.drdoms_keypad2_passcode`. You will also see battery voltage and percentage sensors from the second endpoint. Entity IDs can differ slightly depending on your ZHA version and how many Espressif devices you already have, so always copy the names from your own device page rather than assuming mine.
+
+When you enter a code and press **Enter**, that sensor updates to the numeric value of your input, holds it for two seconds, then drops back to **0**. That brief window is what your automations listen for.
+
+The file `keypad_automation.yaml` is a worked example that maps passcodes to actions — opening a door, raising a cover, closing a cover. Import it as a starting point and adapt it to your home:
+
+1. Go to **Settings → Automations & Scenes → Create Automation → Edit in YAML** (top-right menu).
+2. Paste the contents of `keypad_automation.yaml`, or save the file to your Home Assistant `packages/` folder if you use [packages](https://www.home-assistant.io/docs/configuration/packages/).
+3. Replace every `entity_id` with the ones from your installation — the passcode sensor, the door button, the cover, and so on.
+4. Change the template values to match the codes you actually want. Each `if` block compares the passcode sensor against a number; when they match, the action runs. For example, entering **12345** and pressing Enter triggers `cover.open_cover` on the basement cover in the sample.
+
+```yaml
+# Example: open a cover when passcode 12345 is entered
+- if:
+    - condition: template
+      value_template: "{{ states('sensor.drdoms_keypad2_passcode') | int(0) == 12345 }}"
+  then:
+    - action: cover.open_cover
+      target:
+        entity_id: cover.basement_control_cover
+```
+
+The sample automation listens on two sensor entities because entity naming changed between ZHA versions — `sensor.espressif_zigbeeanalogdevice_power` is the older name, `sensor.drdoms_keypad2_passcode` is the current one. Keep whichever matches your device and delete the other trigger block.
+
+To find the exact integer your keypad sends for a given code, enter the code, press **Enter**, and watch the sensor in **Developer Tools → States**. Use that number in your template condition.
+
 ### Matter and Thread
 
 This repo demonstrates Zigbee because it's the fastest path to a working smart-home integration. But the ESP32-C6 has a native 802.15.4 radio, so porting to **Thread** and **Matter** is straightforward — the touch scanning, debouncing, battery ADC, and deep-sleep wake logic in `main.cpp` don't care which protocol sends the numbers upstream. Espressif's [ESP-Matter](https://github.com/espressif/esp-matter) SDK is the place to start if you want to go that route.
@@ -177,6 +212,7 @@ keypad/
 ├── case_mid_final.stl        # 3D-printable enclosure mid-section
 ├── touch_matrix_Y24.zip      # PCB Gerbers — black on white
 ├── touch_matrix_Y23.zip      # PCB Gerbers — white on black
+├── keypad_automation.yaml    # Home Assistant example — passcode → actions
 └── touch_matrix_*.jpg        # Photos from the build
 ```
 
