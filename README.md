@@ -1,71 +1,89 @@
 # Zigbee Touch Keypad
 
-A battery-powered, wall-mountable touch keypad built around the **ESP32-C6** and an **MPR121** capacitive touch controller. Enter a numeric code on the 12-key pad and the device reports it over **Zigbee** to your smart home — ideal for door codes, alarm panels, or any automation that needs a physical PIN input.
+I wanted a door keypad that actually looked good on the wall — slim, wireless, no visible screws, no cloud dependency. Something I could mount next to the front door, punch in a code, and have Home Assistant react instantly. Off-the-shelf Zigbee keypads exist, but they're either ugly, mains-powered, or locked to one ecosystem. So I built my own.
 
-This repository ships a complete **Zigbee** example firmware. The same ESP32-C6 hardware is equally suited for **Matter** and **Thread** — swap the radio stack and adapt the application layer while keeping the touch input and power-management logic.
+The result is a battery-powered touch keypad about the size of a banana. It runs for roughly **six months** on a single charge, talks **Zigbee** to whatever coordinator you already run, and wakes from deep sleep the moment you touch a key. This repo has everything you need to build one yourself: Gerber files, a 3D-printable case, and working firmware.
 
-## Gallery
+The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** board is equally happy running **Matter** or **Thread** — the touch handling and power logic stay the same; only the radio stack changes.
 
-### Installed
+---
 
-<p align="center">
-  <img src="touch_matrix_real.jpg" alt="Keypad mounted on a wall next to a door" width="480">
-</p>
+## What it looks like on the wall
 
-<p align="center">
-  <img src="touch_matrix%20v17_1a.jpg" alt="Keypad on a concrete wall beside a black door" width="480">
-  <img src="touch_matrix%20v17_1b.jpg" alt="Rendered view of the keypad on a concrete wall" width="480">
-</p>
-
-### Exploded view & internals
+The design goal was something that disappears into a modern entryway. A white slab on textured concrete, twelve touch pads, no mechanical buttons to wear out.
 
 <p align="center">
-  <img src="touch_matrix%20v19.jpg" alt="Exploded view: PCB back, internals with battery and ESP32-C6, and keypad overlay" width="720">
+  <img src="touch_matrix_real.jpg" alt="Finished keypad mounted on a wall beside a door" width="520">
 </p>
+
+Early renders explored proportions and mounting position before the first PCB arrived. Getting the aspect ratio right mattered — too tall and it looks like an intercom, too wide and it reads as a light switch.
 
 <p align="center">
-  <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden surface" width="480">
-  <img src="touch_matrix%20v19b.jpg" alt="Components laid out next to a banana for scale" width="480">
+  <img src="touch_matrix%20v17_1a.jpg" alt="Early prototype mounted on a concrete wall" width="420">
+  <img src="touch_matrix%20v17_1b.jpg" alt="Design render of the keypad on a concrete wall" width="420">
 </p>
 
-## Features
+The front panel is a 2×6 grid: digits **1–9**, **0**, a **clear** key, and **enter**. Labels are printed directly on the PCB solder mask — no separate overlay, no glue, nothing to peel off after two winters.
 
-- **12 capacitive touch keys** — numbers 0–9, clear, and enter
-- **Zigbee end device** — joins a Zigbee 3.0 network and reports passcodes as analog input clusters
-- **Matter & Thread ready** — ESP32-C6 supports all three protocols; this repo demonstrates Zigbee
-- **Battery powered** — 3.7 V / 1300 mAh LiPo with voltage and state-of-charge reporting over Zigbee
-- **~6 months on battery** — aggressive deep-sleep between touches keeps average draw low enough for roughly half a year of typical use
-- **Low power** — enters deep sleep after 10 s of inactivity; wakes on touch via MPR121 interrupt
-- **Status LED** — the onboard LED shines through the translucent case to show when the device wakes up and when a button is pressed
-- **Audible feedback** — short beep on each key press
-- **Factory reset** — hold the BOOT button for 3 s to reset Zigbee pairing
-- **Production-ready PCB** — Gerber files included; upload directly to manufacturers such as [JLCPCB](https://jlcpcb.com)
+---
 
-## Hardware
+## Tear it down
 
-| Component | Description |
-|-----------|-------------|
-| MCU | [ESP32-C6 DevKitC-1](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/index.html) |
-| Touch sensor | [Adafruit MPR121](https://www.adafruit.com/product/1982) (12-channel capacitive touch, I²C) |
-| Power | 3.7 V LiPo (1300 mAh), USB-C charging |
-| Enclosure | Custom PCB backplane + 3D-printed case (`case_mid_final.stl`) |
+Pop the case apart and the internals are deliberately simple. A custom backplane PCB, a 1300 mAh LiPo filling most of the volume, and an ESP32-C6 dev board at the bottom with a USB-C port for charging and flashing.
 
-### Pin mapping
+<p align="center">
+  <img src="touch_matrix%20v19.jpg" alt="Exploded view showing PCB back, battery and ESP32 assembly, and keypad face" width="680">
+</p>
+
+The whole assembly is small enough to hold in one hand. For scale:
+
+<p align="center">
+  <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden workbench" width="400">
+  <img src="touch_matrix%20v19b.jpg" alt="All parts laid out next to a banana for size comparison" width="400">
+</p>
+
+Three layers, top to bottom:
+
+1. **Keypad face** — the touch matrix PCB you see and press
+2. **Electronics bay** — battery, ESP32-C6, MPR121 touch controller, buzzer
+3. **Back cover** — 3D-printed shell (`case_mid_final.stl`) that clips on without screws
+
+The onboard LED sits behind the translucent front panel. When the device wakes from deep sleep it glows briefly; each key press flashes it again so you always know your touch registered — even before the buzzer fires.
+
+---
+
+## Order the PCB
+
+You don't need to lay out a board from scratch. The Gerber files are in this repo and ready to upload to any fab. I've been using [JLCPCB](https://jlcpcb.com) — drop in `touch_matrix_Y24.zip` (latest revision) or `touch_matrix_Y23.zip` (previous spin) and order. No CAM fixes, no layer renaming, no back-and-forth with support.
+
+The back of the PCB carries the JLC order markings and a five-pin header for the MPR121:
+
+| Pin | Function |
+|-----|----------|
+| GND | Ground |
+| INT | Interrupt (wake from sleep) |
+| SCL | I²C clock |
+| SDA | I²C data |
+| 3.3 V | Power |
+
+Solder an [Adafruit MPR121](https://www.adafruit.com/product/1982) breakout to that header, or wire it directly if you prefer.
+
+---
+
+## Wire it up
+
+The firmware expects this pin mapping on the ESP32-C6 DevKitC-1:
 
 | Signal | GPIO | Notes |
 |--------|------|-------|
 | I²C SDA | 18 | MPR121 data |
 | I²C SCL | 4 | MPR121 clock |
-| IRQ | 6 | MPR121 interrupt (deep-sleep wake) |
+| IRQ | 6 | MPR121 interrupt — also the deep-sleep wake source |
 | Battery ADC | 2 | Voltage divider input |
-| Buzzer | 15 | Key-press feedback |
-| BOOT button | 9 | Factory reset (hold 3 s) |
+| Buzzer | 15 | Short beep on every key press |
+| BOOT button | 9 | Hold 3 s for Zigbee factory reset |
 
-The touch matrix PCB exposes a 5-pin header (**GND, INT, SCL, SDA, 3.3 V**) for connecting the MPR121 breakout.
-
-### Key layout
-
-The 12 MPR121 channels map to the front-panel keys:
+The twelve MPR121 channels map to the front-panel keys like this:
 
 | Channel | Key |
 |---------|-----|
@@ -74,96 +92,95 @@ The 12 MPR121 channels map to the front-panel keys:
 | 10 | Clear |
 | 11 | Enter |
 
-Up to **8 digits** can be entered before the buffer is full.
+Up to eight digits fit in the input buffer.
 
-### PCB manufacturing
+---
 
-Gerber files for the touch-matrix PCB are bundled in `touch_matrix_Y24.zip` (latest revision) and `touch_matrix_Y23.zip`. Extract the archive and upload the Gerbers to any PCB fab — they are ready to order as-is from [JLCPCB](https://jlcpcb.com) and similar services without further conversion.
+## Flash the firmware
 
-## Wireless integration
-
-### Zigbee (included example)
-
-The device registers as a Zigbee **end device** with manufacturer **DrDoms** and model **KeyPad2**. Two endpoints are exposed:
-
-| Endpoint | Cluster | Description |
-|----------|---------|-------------|
-| 1 | Analog Input + Battery | Passcode entry and battery status |
-| 2 | Analog Input | Battery state of charge (%) |
-
-**Passcode flow**
-
-1. User enters digits and presses **Enter**.
-2. The entered value is reported on endpoint 1 as an analog input (`Passcode`).
-3. Battery voltage and percentage are reported at the same time.
-4. After 2 s the passcode is reset to **0** (clears the reported value for the next entry).
-
-Pair the device with any Zigbee 3.0 coordinator (ZHA, Zigbee2MQTT, etc.) and bind to the analog input clusters.
-
-### Matter & Thread
-
-The ESP32-C6 radio supports **802.15.4**, making it a natural platform for **Thread** and **Matter** end devices as well. The touch handling, battery monitoring, and deep-sleep logic in `main.cpp` are protocol-agnostic — only the reporting layer needs to change. Espressif's [ESP-Matter](https://github.com/espressif/esp-matter) SDK provides a starting point for a Matter port.
-
-## Building & flashing
-
-This project uses [PlatformIO](https://platformio.org/).
-
-### Prerequisites
-
-- [PlatformIO Core](https://docs.platformio.org/en/latest/core/installation.html) or the PlatformIO IDE extension
-- USB connection to the ESP32-C6 DevKit
-
-### Build
-
-```bash
-pio run
-```
-
-### Upload
+The project builds with [PlatformIO](https://platformio.org/). Clone the repo, connect the ESP32-C6 over USB-C, and:
 
 ```bash
 pio run --target upload
 ```
 
-### Serial monitor
+To watch the serial log while pairing:
 
 ```bash
 pio device monitor
 ```
 
-The firmware is configured for **Zigbee end-device mode** (`ZIGBEE_MODE_ED`) with a custom partition table (`partitions_zigbee.csv`) that reserves space for Zigbee storage.
+The build targets **Zigbee end-device mode** (`ZIGBEE_MODE_ED`) with a custom partition table (`partitions_zigbee.csv`) that reserves flash for Zigbee network storage. Dependencies are pulled automatically — the main one is the Adafruit MPR121 library.
 
-## Usage
+---
 
-1. Power on the keypad and wait for it to join your Zigbee network (status dots print over serial at 115200 baud).
-2. The status LED glows through the case when the device wakes from deep sleep.
-3. Enter a numeric code on the touch pad — each press lights the LED and triggers a short beep.
-4. Press **Enter** to transmit the code.
-5. Press **Clear** to reset input.
-6. After 10 s without a touch, the device enters deep sleep. The next touch wakes it instantly.
+## Join your Zigbee network
 
-### Factory reset
+On first boot the keypad scans for a coordinator. Dots print on the serial console at 115200 baud until it joins. In Home Assistant that means adding it through ZHA or Zigbee2MQTT — the device shows up as manufacturer **DrDoms**, model **KeyPad2**.
 
-Hold the **BOOT** button for more than 3 seconds. The device performs a Zigbee factory reset and reboots, allowing re-pairing to a new coordinator.
+Two Zigbee endpoints are exposed:
 
-## Project structure
+| Endpoint | Cluster | What it reports |
+|----------|---------|-----------------|
+| 1 | Analog Input + Battery | Entered passcode, battery voltage |
+| 2 | Analog Input | Battery state of charge (%) |
+
+The passcode flow works like this:
+
+1. Touch digits on the pad — the LED confirms each press, the buzzer beeps.
+2. Press **Enter**. The code is reported on endpoint 1 as an analog value.
+3. Battery level is reported at the same time.
+4. Two seconds later the reported value resets to **0**, ready for the next entry.
+
+Press **Clear** at any time to wipe the buffer and start over.
+
+### Matter and Thread
+
+This repo demonstrates Zigbee because it's the fastest path to a working smart-home integration. But the ESP32-C6 has a native 802.15.4 radio, so porting to **Thread** and **Matter** is straightforward — the touch scanning, debouncing, battery ADC, and deep-sleep wake logic in `main.cpp` don't care which protocol sends the numbers upstream. Espressif's [ESP-Matter](https://github.com/espressif/esp-matter) SDK is the place to start if you want to go that route.
+
+---
+
+## Power: six months on a charge
+
+Battery life was the hardest constraint. A keypad that's dead every two weeks is worse than no keypad at all.
+
+The trick is aggressive deep sleep. After ten seconds without a touch, the firmware shuts everything down and puts the MPR121 into its slowest scan rate. The ESP32-C6 draws almost nothing. The next finger on the pad pulls the MPR121 interrupt line low, the MCU wakes, re-initialises I²C, and is ready to scan within milliseconds.
+
+With a 1300 mAh cell and typical use — a few code entries per day — that works out to roughly **half a year** between USB-C charges. Battery voltage and percentage are reported over Zigbee so you can set a low-battery alert in Home Assistant before it goes flat.
+
+---
+
+## Day-to-day use
+
+1. Walk up and touch a key. The LED glows through the case as the device wakes.
+2. Enter your code. Each digit beeps and flashes the LED.
+3. Press **Enter** to send it to your automation.
+4. Walk away. Ten seconds later it sleeps again.
+
+If you need to re-pair — new coordinator, corrupted network, that sort of thing — hold the **BOOT** button for more than three seconds. The device factory-resets its Zigbee stack and reboots.
+
+---
+
+## What's in this repo
 
 ```
 keypad/
-├── main.cpp                  # Firmware — touch handling, Zigbee, power management
-├── platformio.ini            # Board, libraries, and build flags
-├── partitions_zigbee.csv     # Flash partition layout for Zigbee
+├── main.cpp                  # Touch handling, Zigbee reporting, power management
+├── platformio.ini            # Board target, libraries, build flags
+├── partitions_zigbee.csv     # Flash layout with Zigbee storage partitions
 ├── case_mid_final.stl        # 3D-printable enclosure mid-section
-├── touch_matrix_Y24.zip      # Latest PCB Gerber files (JLCPCB-ready)
+├── touch_matrix_Y24.zip      # Latest PCB Gerbers (JLCPCB-ready)
 ├── touch_matrix_Y23.zip      # Previous PCB revision
-└── touch_matrix_*.jpg        # Hardware photos
+└── touch_matrix_*.jpg        # Photos from the build
 ```
 
-## License
+---
 
-This project is dual-licensed:
+## License
 
 | Part | License | File |
 |------|---------|------|
 | Firmware (`main.cpp`, build config) | [MIT License](LICENSE) | `LICENSE` |
 | Hardware (PCB Gerbers, STL, design files) | [CERN Open Hardware Licence v2 — Strongly Reciprocal](LICENSE.hardware) | `LICENSE.hardware` |
+
+Build one, hack on it, mount it by your door. If you make a variant — Matter port, different key layout, waterproof enclosure — I'd love to see it.
