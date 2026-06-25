@@ -139,7 +139,7 @@ The passcode flow works like this:
 3. Battery level is reported at the same time.
 4. Two seconds later the reported value resets to **0**, ready for the next entry.
 
-**Leading 1:** The firmware always prepends a **1** to every code before sending it. The input buffer starts as `"1"` and resets to `"1"` after clear or enter, so the reported value is never just the digits you typed — it is always that leading 1 followed by whatever you entered. Type **0** then **1** and Home Assistant receives **101**, not **1**. ZHA stores this as a number, so leading zeros are not stripped either — the value is purely numeric, not a string. Plan your automation thresholds accordingly: check the sensor in **Developer Tools → States** after entering a code to see the exact integer your keypad produces.
+**Leading 1:** The firmware always prepends a **1** to every code before sending it. The input buffer starts as `"1"` and resets to `"1"` after clear or enter. This is because ensure that leading zeros in your entered code are not stripped as the value is purely numeric, not a string. 
 
 Press **Clear** at any time to wipe the buffer and start over.
 
