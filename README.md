@@ -44,10 +44,10 @@ The whole assembly is small enough to hold in one hand. For scale:
 Three layers, top to bottom:
 
 1. **Keypad face** — the touch matrix PCB you see and press
-2. **Electronics bay** — battery, ESP32-C6, MPR121 touch controller, buzzer
+2. **Electronics bay** — battery, ESP32-C6, MPR121 touch controller
 3. **Back cover** — 3D-printed shell (`case_mid_final.stl`) that clips on without screws
 
-The onboard LED sits inside the white case that is somewhat translucent. When the device wakes from deep sleep it glows briefly; each key press flashes it again so you always know your touch registered — even before the buzzer fires.
+The onboard LED sits inside the white case that is somewhat translucent. When the device wakes from deep sleep it glows briefly; each key press flashes it again so you always know your touch registered.
 
 ---
 
@@ -86,7 +86,6 @@ The firmware expects this pin mapping on the ESP32-C6 DevKitC-1:
 | I²C SCL | 4 | MPR121 clock |
 | IRQ | 6 | MPR121 interrupt — also the deep-sleep wake source |
 | Battery ADC | 2 | Voltage divider input |
-| Buzzer | 15 | Short beep on every key press |
 | BOOT button | 9 | Hold 3 s for Zigbee factory reset |
 
 The twelve MPR121 channels map to the front-panel keys like this:
@@ -133,10 +132,12 @@ Two Zigbee endpoints are exposed:
 
 The passcode flow works like this:
 
-1. Touch digits on the pad — the LED confirms each press, the buzzer beeps.
+1. Touch digits on the pad — the LED confirms each press.
 2. Press **Enter**. The code is reported on endpoint 1 as an analog value.
 3. Battery level is reported at the same time.
 4. Two seconds later the reported value resets to **0**, ready for the next entry.
+
+**Leading 1:** The firmware always prepends a **1** to every code before sending it. The input buffer starts as `"1"` and resets to `"1"` after clear or enter, so the reported value is never just the digits you typed — it is always that leading 1 followed by whatever you entered. Type **0** then **1** and Home Assistant receives **101**, not **1**. ZHA stores this as a number, so leading zeros are not stripped either — the value is purely numeric, not a string. Plan your automation thresholds accordingly: check the sensor in **Developer Tools → States** after entering a code to see the exact integer your keypad produces.
 
 Press **Clear** at any time to wipe the buffer and start over.
 
@@ -151,14 +152,14 @@ Once the keypad is flashed, getting it into [Home Assistant](https://www.home-as
 
 After pairing, open the device page and note the entity names ZHA created. The important one is the **Passcode** analog-input sensor — in my setup it shows up as `sensor.drdoms_keypad2_passcode`. You will also see battery voltage and percentage sensors from the second endpoint. Entity IDs can differ slightly depending on your ZHA version and how many Espressif devices you already have, so always copy the names from your own device page rather than assuming mine.
 
-When you enter a code and press **Enter**, that sensor updates to the numeric value of your input, holds it for two seconds, then drops back to **0**. That brief window is what your automations listen for.
+When you enter a code and press **Enter**, that sensor updates to the numeric value of your input — including the leading **1** described above — holds it for two seconds, then drops back to **0**. That brief window is what your automations listen for.
 
 The file `keypad_automation.yaml` is a worked example that maps passcodes to actions — opening a door, raising a cover, closing a cover. Import it as a starting point and adapt it to your home:
 
 1. Go to **Settings → Automations & Scenes → Create Automation → Edit in YAML** (top-right menu).
 2. Paste the contents of `keypad_automation.yaml`, or save the file to your Home Assistant `packages/` folder if you use [packages](https://www.home-assistant.io/docs/configuration/packages/).
 3. Replace every `entity_id` with the ones from your installation — the passcode sensor, the door button, the cover, and so on.
-4. Change the template values to match the codes you actually want. Each `if` block compares the passcode sensor against a number; when they match, the action runs. For example, entering **12345** and pressing Enter triggers `cover.open_cover` on the basement cover in the sample.
+4. Change the template values to match the codes you actually want. Each `if` block compares the passcode sensor against a number; when they match, the action runs. Remember to account for the leading **1** — the sample value `12345` means you typed **2-3-4-5** on the pad, not **1-2-3-4-5**. A code you enter as **0-1** will appear as **101** in Home Assistant.
 
 ```yaml
 # Example: open a cover when passcode 12345 is entered
@@ -194,7 +195,7 @@ With a 1300 mAh cell and typical use — a few code entries per day — that wor
 ## Day-to-day use
 
 1. Walk up and touch a key. The LED glows through the case as the device wakes.
-2. Enter your code. Each digit beeps and flashes the LED.
+2. Enter your code. Each digit flashes the LED.
 3. Press **Enter** to send it to your automation.
 4. Walk away. Ten seconds later it sleeps again.
 
