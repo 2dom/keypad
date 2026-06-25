@@ -1,2 +1,130 @@
-# keypad
-# keypad
+# Zigbee Touch Keypad
+
+A battery-powered, wall-mountable touch keypad built around the **ESP32-C6** and an **MPR121** capacitive touch controller. Enter a numeric code on the 12-key pad and the device reports it over **Zigbee** to your smart home — ideal for door codes, alarm panels, or any automation that needs a physical PIN input.
+
+<p align="center">
+  <img src="touch_matrix_real.jpg" alt="Installed keypad on a wall next to a door" width="480">
+</p>
+
+## Features
+
+- **12 capacitive touch keys** — numbers 0–9, clear, and enter
+- **Zigbee end device** — joins a Zigbee 3.0 network and reports passcodes as analog input clusters
+- **Battery powered** — LiPo cell with voltage and state-of-charge reporting over Zigbee
+- **Low power** — enters deep sleep after 10 s of inactivity; wakes on touch via MPR121 interrupt
+- **Audible feedback** — short beep on each key press
+- **Factory reset** — hold the BOOT button for 3 s to reset Zigbee pairing
+
+## Hardware
+
+<p align="center">
+  <img src="touch_matrix v19.jpg" alt="Keypad internals: battery, ESP32-C6 board, and touch matrix" width="720">
+</p>
+
+| Component | Description |
+|-----------|-------------|
+| MCU | [ESP32-C6 DevKitC-1](https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/esp32-c6-devkitc-1/index.html) |
+| Touch sensor | [Adafruit MPR121](https://www.adafruit.com/product/1982) (12-channel capacitive touch, I²C) |
+| Power | 3.7 V LiPo (~1300 mAh), USB-C charging |
+| Enclosure | Custom PCB backplane + 3D-printed case (`case_mid_final.stl`) |
+
+### Pin mapping
+
+| Signal | GPIO | Notes |
+|--------|------|-------|
+| I²C SDA | 18 | MPR121 data |
+| I²C SCL | 4 | MPR121 clock |
+| IRQ | 6 | MPR121 interrupt (deep-sleep wake) |
+| Battery ADC | 2 | Voltage divider input |
+| Buzzer | 15 | Key-press feedback |
+| BOOT button | 9 | Factory reset (hold 3 s) |
+
+The touch matrix PCB exposes a 5-pin header (**GND, INT, SCL, SDA, 3.3 V**) for connecting the MPR121 breakout.
+
+### Key layout
+
+The 12 MPR121 channels map to the front-panel keys:
+
+| Channel | Key |
+|---------|-----|
+| 0–8 | 1 – 9 |
+| 9 | 0 |
+| 10 | Clear |
+| 11 | Enter |
+
+Up to **8 digits** can be entered before the buffer is full.
+
+## Zigbee integration
+
+The device registers as a Zigbee **end device** with manufacturer **DrDoms** and model **KeyPad2**. Two endpoints are exposed:
+
+| Endpoint | Cluster | Description |
+|----------|---------|-------------|
+| 1 | Analog Input + Battery | Passcode entry and battery status |
+| 2 | Analog Input | Battery state of charge (%) |
+
+**Passcode flow**
+
+1. User enters digits and presses **Enter**.
+2. The entered value is reported on endpoint 1 as an analog input (`Passcode`).
+3. Battery voltage and percentage are reported at the same time.
+4. After 2 s the passcode is reset to **0** (clears the reported value for the next entry).
+
+Pair the device with any Zigbee 3.0 coordinator (ZHA, Zigbee2MQTT, etc.) and bind to the analog input clusters.
+
+## Building & flashing
+
+This project uses [PlatformIO](https://platformio.org/).
+
+### Prerequisites
+
+- [PlatformIO Core](https://docs.platformio.org/en/latest/core/installation.html) or the PlatformIO IDE extension
+- USB connection to the ESP32-C6 DevKit
+
+### Build
+
+```bash
+pio run
+```
+
+### Upload
+
+```bash
+pio run --target upload
+```
+
+### Serial monitor
+
+```bash
+pio device monitor
+```
+
+The firmware is configured for **Zigbee end-device mode** (`ZIGBEE_MODE_ED`) with a custom partition table (`partitions_zigbee.csv`) that reserves space for Zigbee storage.
+
+## Usage
+
+1. Power on the keypad and wait for it to join your Zigbee network (status dots print over serial at 115200 baud).
+2. Enter a numeric code on the touch pad.
+3. Press **Enter** to transmit the code.
+4. Press **Clear** to reset input.
+5. After 10 s without a touch, the device enters deep sleep. The next touch wakes it instantly.
+
+### Factory reset
+
+Hold the **BOOT** button for more than 3 seconds. The device performs a Zigbee factory reset and reboots, allowing re-pairing to a new coordinator.
+
+## Project structure
+
+```
+keypad/
+├── main.cpp                  # Firmware — touch handling, Zigbee, power management
+├── platformio.ini            # Board, libraries, and build flags
+├── partitions_zigbee.csv     # Flash partition layout for Zigbee
+├── case_mid_final.stl        # 3D-printable enclosure mid-section
+├── touch_matrix_*.jpg        # Hardware photos and PCB layout references
+└── touch_matrix_Y2*.zip      # Touch matrix PCB design files
+```
+
+## License
+
+Firmware and hardware design files in this repository are provided as-is for personal use.
