@@ -1,8 +1,8 @@
 # Zigbee Touch Keypad
 
-I wanted a door keypad that actually looked good on the wall — slim, wireless, no visible screws, no cloud dependency. Something I could mount next to the front door, punch in a code, and have Home Assistant react instantly. Off-the-shelf Zigbee keypads exist, but they're either ugly, mains-powered, or locked to one ecosystem. So I built my own.
+I wanted a door keypad that actually looked good on the wall — slim, wireless, no visible screws, no cloud dependency. Something I could mount next to the front door, punch in a code, and have Home Assistant react instantly. Off-the-shelf Zigbee keypads exist, but they're usually expensive, mains-powered, or locked to one ecosystem. So I built my own.
 
-The result is a battery-powered touch keypad about the size of a banana. It runs for roughly **six months** on a single charge, talks **Zigbee** to whatever coordinator you already run, and wakes from deep sleep the moment you touch a key. This repo has everything you need to build one yourself: Gerber files, a 3D-printable case, and working firmware.
+The result is a battery-powered touch keypad about the size of a pez dispenser. It runs for roughly **six months** on a single charge, talks **Zigbee** to whatever coordinator you already run, and wakes from deep sleep the moment you touch a key. This repo has everything you need to build one yourself: Gerber files, a 3D-printable case, and working firmware.
 
 The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** board is equally happy running **Matter** or **Thread** — the touch handling and power logic stay the same; only the radio stack changes.
 
@@ -20,8 +20,7 @@ Early renders explored proportions and mounting position before the first PCB ar
 
 <p align="center">
   <img src="touch_matrix%20v17_1a.jpg" alt="Early prototype mounted on a concrete wall" width="420">
-  <img src="touch_matrix%20v17_1b.jpg" alt="Design render of the keypad on a concrete wall" width="420">
-</p>
+ </p>
 
 The front panel is a 2×6 grid: digits **1–9**, **0**, a **clear** key, and **enter**. Labels are printed directly on the PCB solder mask — no separate overlay, no glue, nothing to peel off after two winters.
 
@@ -48,13 +47,20 @@ Three layers, top to bottom:
 2. **Electronics bay** — battery, ESP32-C6, MPR121 touch controller, buzzer
 3. **Back cover** — 3D-printed shell (`case_mid_final.stl`) that clips on without screws
 
-The onboard LED sits behind the translucent front panel. When the device wakes from deep sleep it glows briefly; each key press flashes it again so you always know your touch registered — even before the buzzer fires.
+The onboard LED sits inside the white case that is somewhat translucent. When the device wakes from deep sleep it glows briefly; each key press flashes it again so you always know your touch registered — even before the buzzer fires.
 
 ---
 
 ## Order the PCB
 
-You don't need to lay out a board from scratch. The Gerber files are in this repo and ready to upload to any fab. I've been using [JLCPCB](https://jlcpcb.com) — drop in `touch_matrix_Y24.zip` (latest revision) or `touch_matrix_Y23.zip` (previous spin) and order. No CAM fixes, no layer renaming, no back-and-forth with support.
+You don't need to lay out a board from scratch. The Gerber files are in this repo and ready to upload to any fab. I've been using [JLCPCB](https://jlcpcb.com) — pick a colour scheme, drop in the matching zip, and order. No CAM fixes, no layer renaming, no back-and-forth with support.
+
+| File | Colour scheme |
+|------|---------------|
+| `touch_matrix_Y24.zip` | **Black on white** — black key labels on a white PCB (latest revision) |
+| `touch_matrix_Y23.zip` | **White on black** — white key labels on a black PCB |
+
+Same layout, same touch pads — only the silkscreen colours differ. Choose whichever fits your wall and enclosure.
 
 The back of the PCB carries the JLC order markings and a five-pin header for the MPR121:
 
@@ -169,8 +175,8 @@ keypad/
 ├── platformio.ini            # Board target, libraries, build flags
 ├── partitions_zigbee.csv     # Flash layout with Zigbee storage partitions
 ├── case_mid_final.stl        # 3D-printable enclosure mid-section
-├── touch_matrix_Y24.zip      # Latest PCB Gerbers (JLCPCB-ready)
-├── touch_matrix_Y23.zip      # Previous PCB revision
+├── touch_matrix_Y24.zip      # PCB Gerbers — black on white
+├── touch_matrix_Y23.zip      # PCB Gerbers — white on black
 └── touch_matrix_*.jpg        # Photos from the build
 ```
 
@@ -183,4 +189,4 @@ keypad/
 | Firmware (`main.cpp`, build config) | [MIT License](LICENSE) | `LICENSE` |
 | Hardware (PCB Gerbers, STL, design files) | [CERN Open Hardware Licence v2 — Strongly Reciprocal](LICENSE.hardware) | `LICENSE.hardware` |
 
-Build one, hack on it, mount it by your door. If you make a variant — Matter port, different key layout, waterproof enclosure — I'd love to see it.
+It really works well - has been my method of entry for the past year. If you make a variant — Matter port, different key layout, waterproof enclosure — I'd love to see it.
