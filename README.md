@@ -37,10 +37,11 @@ Pop the case apart and the internals are deliberately simple. A custom backplane
 The whole assembly is small enough to hold in one hand. For scale:
 
 <p align="center">
-  <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden workbench" width="400">
-  <img src="touch_matrix%20v19b.jpg" alt="All parts laid out next to a banana for size comparison" width="400">
+  <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden workbench" width="680">
+  <img src="touch_matrix%20v19b.jpg" alt="All parts laid out next to a banana for size comparison" 
 </p>
 
+ 
 Three layers, top to bottom:
 
 1. **Keypad face** — the touch matrix PCB you see and press
@@ -88,6 +89,8 @@ The firmware expects this pin mapping on the ESP32-C6 DevKitC-1:
 | Battery ADC | 2 | Voltage divider input |
 | BOOT button | 9 | Hold 3 s for Zigbee factory reset |
 
+The wiring is very straigt forward - simply connect all the pins as described, connect the battery to ESP32-C6, route 3.3V and ground to the PCB and done. If you would like the battery SOC reported, you need to add an additional voltage device to the battery. 
+
 The twelve MPR121 channels map to the front-panel keys like this:
 
 | Channel | Key |
@@ -97,7 +100,7 @@ The twelve MPR121 channels map to the front-panel keys like this:
 | 10 | Clear |
 | 11 | Enter |
 
-Up to eight digits fit in the input buffer.
+For now the software allows coes up to eight digits.
 
 ---
 
