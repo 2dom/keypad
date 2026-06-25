@@ -34,7 +34,7 @@ Pop the case apart and the internals are deliberately simple. A custom backplane
   <img src="touch_matrix%20v19.jpg" alt="Exploded view showing PCB back, battery and ESP32 assembly, and keypad face" width="680">
 </p>
 
-The whole assembly is rather small and light enough hence can be mounted with touble sided stick tape or white tack. For scale:
+The whole assembly is rather light hence can be mounted to the wall with a few bites of white tack. For scale:
 
 <p align="center">
   <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden workbench" width="680">
