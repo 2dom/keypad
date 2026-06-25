@@ -13,13 +13,13 @@ The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** boa
 The design goal was something that disappears into a modern entryway. A white slab on textured concrete, twelve touch pads, no mechanical buttons to wear out.
 
 <p align="center">
-  <img src="touch_matrix_real.jpg" alt="Finished keypad mounted on a wall beside a door" width="520">
+  <img src="touch_matrix_real.jpg" alt="Finished keypad mounted on a wall beside a door" width="680">
 </p>
 
 Early renders explored proportions and mounting position before the first PCB arrived. Getting the aspect ratio right mattered — too tall and it looks like an intercom, too wide and it reads as a light switch.
 
 <p align="center">
-  <img src="touch_matrix%20v17_1a.jpg" alt="Early prototype mounted on a concrete wall" width="420">
+  <img src="touch_matrix%20v17_1a.jpg" alt="Early prototype mounted on a concrete wall" width="680">
  </p>
 
 The front panel is a 2×6 grid: digits **1–9**, **0**, a **clear** key, and **enter**. Labels are printed directly on the PCB solder mask — no separate overlay, no glue, nothing to peel off after two winters.
