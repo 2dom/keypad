@@ -73,7 +73,6 @@ The back of the PCB carries the JLC order markings and a five-pin header for the
 | SDA | I²C data |
 | 3.3 V | Power |
 
-Solder an [Adafruit MPR121](https://www.adafruit.com/product/1982) breakout to that header, or wire it directly if you prefer.
 
 ---
 
@@ -89,7 +88,7 @@ The firmware expects this pin mapping on the ESP32-C6 DevKitC-1:
 | Battery ADC | 2 | Voltage divider input |
 | BOOT button | 9 | Hold 3 s for Zigbee factory reset |
 
-The wiring is very straigt forward - simply connect all the pins as described, connect the battery to ESP32-C6, route 3.3V and ground to the PCB and done. If you would like the battery SOC reported, you need to add an additional voltage device to the battery. 
+The wiring is very straigtforward - simply connect all the pins as described, connect the battery to ESP32-C6 bat pins, route 3.3V and ground to the PCB and done. If you would like the battery SOC reported, you will need to add an additional voltage device to the battery pins. 
 
 The twelve MPR121 channels map to the front-panel keys like this:
 
