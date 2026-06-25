@@ -38,7 +38,7 @@ The whole assembly is small enough to hold in one hand. For scale:
 
 <p align="center">
   <img src="touch_matrix%20v19a.jpg" alt="Exploded assembly on a wooden workbench" width="680">
-  <img src="touch_matrix%20v19b.jpg" alt="All parts laid out next to a banana for size comparison" 
+  <img src="touch_matrix%20v19b.jpg" alt="All parts laid out next to a banana for size comparison" width="680">
 </p>
 
  
