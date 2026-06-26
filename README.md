@@ -6,20 +6,19 @@ The result is a battery-powered touch keypad about the size of a pez dispenser. 
 
 The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** board is equally happy running **Matter** or **Thread** — the touch handling and power logic stay the same; only the radio stack changes.
 
+<p align="center"><a href="https://www.youtube.com/watch?v=2Mcdj70jt44"><strong>▶ Watch on YouTube</strong></a></p>
 ---
 
 ## What it looks like on the wall
 
 The design goal was something that disappears into a modern entryway. A white slab on textured walls, twelve touch buttons, no mechanics to wear out.
 
-
-
 <p align="center">
   <a href="https://www.youtube.com/watch?v=2Mcdj70jt44" title="Watch on YouTube">
     <img src="touch_matrix_real2.jpg" alt="Watch the keypad in action on YouTube" width="680">
   </a>
 </p>
-<p align="center"><a href="https://www.youtube.com/watch?v=2Mcdj70jt44"><strong>▶ Watch on YouTube</strong></a></p>
+
 
 Early renders explored proportions and mounting position before the first PCB arrived. Getting the aspect ratio right mattered — too tall and it looks just weird, too wide and it reads as a light switch.
 
