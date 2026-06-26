@@ -12,13 +12,11 @@ The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** boa
 
 The design goal was something that disappears into a modern entryway. A white slab on textured walls, twelve touch buttons, no mechanics to wear out.
 
-<p align="center">
-  <img src="touch_matrix_real2.jpg" alt="Finished keypad mounted on a wall beside a door" width="680">
-</p>
+
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=2Mcdj70jt44" title="Watch on YouTube">
-    <img src="touch_matrix_real2_youtube.jpg" alt="Watch the keypad in action on YouTube" width="680">
+    <img src="touch_matrix_real2_youtube.jpg" alt="Watch the keypad in action on YouTube" width="680" height="383">
   </a>
 </p>
 <p align="center"><a href="https://www.youtube.com/watch?v=2Mcdj70jt44"><strong>▶ Watch on YouTube</strong></a></p>
