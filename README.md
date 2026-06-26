@@ -7,7 +7,6 @@ The result is a battery-powered touch keypad about the size of a pez dispenser. 
 The firmware ships as a **Zigbee** end-device example. The same **ESP32-C6** board is equally happy running **Matter** or **Thread** — the touch handling and power logic stay the same; only the radio stack changes.
 
 <p align="center"><a href="https://www.youtube.com/watch?v=2Mcdj70jt44"><strong>▶ Watch on YouTube</strong></a></p>
----
 
 ## What it looks like on the wall
 
