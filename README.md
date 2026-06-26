@@ -17,10 +17,11 @@ The design goal was something that disappears into a modern entryway. A white sl
 </p>
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=2Mcdj70jt44">
-    <img src="https://img.youtube.com/vi/2Mcdj70jt44/hqdefault.jpg" alt="Watch the keypad in action on YouTube" width="680">
+  <a href="https://www.youtube.com/watch?v=2Mcdj70jt44" title="Watch on YouTube">
+    <img src="touch_matrix_real2_youtube.jpg" alt="Watch the keypad in action on YouTube" width="680">
   </a>
 </p>
+<p align="center"><a href="https://www.youtube.com/watch?v=2Mcdj70jt44"><strong>▶ Watch on YouTube</strong></a></p>
 
 Early renders explored proportions and mounting position before the first PCB arrived. Getting the aspect ratio right mattered — too tall and it looks just weird, too wide and it reads as a light switch.
 
