@@ -1,0 +1,66 @@
+alias: Keypad_code_door
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.espressif_zigbeeanalogdevice_power
+  - trigger: state
+    entity_id:
+      - sensor.drdoms_keypad2_passcode
+conditions: []
+actions:
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.espressif_zigbeeanalogdevice_power') | int(0) ==100223}}"
+    then:
+      - action: input_button.press
+        metadata: {}
+        data: {}
+        target:
+          entity_id: input_button.open_door_button
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.espressif_zigbeeanalogdevice_power')| int(0)==199554}}"
+    then:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.basement_control_cover
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.espressif_zigbeeanalogdevice_power') | int(0)==1646664}}"
+    then:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.basement_control_cover
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.drdoms_keypad2_passcode') | int(0) ==100353}}"
+    then:
+      - action: input_button.press
+        metadata: {}
+        data: {}
+        target:
+          entity_id: input_button.open_door_button
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.drdoms_keypad2_passcode')| int(0)==12345}}"
+    then:
+      - action: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.basement_control_cover
+  - if:
+      - condition: template
+        value_template: "  {{states('sensor.drdoms_keypad2_passcode') | int(0)==75675}}"
+    then:
+      - action: cover.close_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.basement_control_cover
+mode: single
