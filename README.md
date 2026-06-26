@@ -18,7 +18,7 @@ The design goal was something that disappears into a modern entryway. A white sl
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=2Mcdj70jt44">
-    <img src="https://img.youtube.com/vi/2Mcdj70jt44/hqdefault.jpg" alt="Watch the keypad demo on YouTube" width="680">
+    <img src="touch_matrix_real2_youtube.jpg" alt="Watch the keypad demo on YouTube" width="680">
   </a>
 </p>
 
